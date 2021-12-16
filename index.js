@@ -46,7 +46,7 @@ app.use(
 let publicRoutes = require("./routes/index");
 let apiRoutes = require("./routes/api");
 
-app.use("/api", apiRoutes);
+app.use("/orders", apiRoutes);
 app.use("/", (req, res) => {
     res.json({
         IsSuccess: true,

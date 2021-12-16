@@ -10,12 +10,21 @@ module.exports = {
         };
 
         try {
-            let result = await new Order(req.body).save()
-
-            respObj.IsSuccess = true;
-            respObj.Message = "Susscefully added"
-            res.status(200).json(respObj);
-
+            await Order.findOne({
+                order_id: req.body.order_id
+            }).then(async function(data){
+                if(data){
+                    respObj.IsSuccess = true;
+                    respObj.Message = "Order id is must be unique"
+                    res.status(200).json(respObj);
+                }else{
+                    let result = await new Order(req.body).save()
+                    respObj.IsSuccess = true;
+                    respObj.Message = "Susscefully added"
+                    res.status(200).json(respObj);
+                }
+            })
+            
         } catch (err) {
             respObj.error = err;
             (respObj.message = err.message || "Error while processing db query"),
@@ -30,7 +39,9 @@ module.exports = {
         };
 
         try {
-            let result = await Order.find()
+            let result = await Order.find({
+                order_date: req.params.date
+            })
 
             respObj.IsSuccess = true;
             respObj.Data = result
