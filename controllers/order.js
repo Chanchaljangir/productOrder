@@ -12,19 +12,19 @@ module.exports = {
         try {
             await Order.findOne({
                 order_id: req.body.order_id
-            }).then(async function(data){
-                if(data){
+            }).then(async function (data) {
+                if (data) {
                     respObj.IsSuccess = true;
                     respObj.Message = "Order id is must be unique"
                     res.status(200).json(respObj);
-                }else{
+                } else {
                     let result = await new Order(req.body).save()
                     respObj.IsSuccess = true;
                     respObj.Message = "Susscefully added"
                     res.status(200).json(respObj);
                 }
             })
-            
+
         } catch (err) {
             respObj.error = err;
             (respObj.message = err.message || "Error while processing db query"),
@@ -42,11 +42,15 @@ module.exports = {
             let result = await Order.find({
                 order_date: req.params.date
             })
-
-            respObj.IsSuccess = true;
-            respObj.Data = result
-            respObj.Message = "Susscefully get all data"
-            res.status(200).json(respObj);
+            result ? res.status(200).send({
+                Message: "Susscefully fetch all orders",
+                IsSuccess: true,
+                Data: result
+            }) :
+                result.status(422).send({
+                    Message: "Failed to fetch",
+                    IsSuccess: false
+                })
 
         } catch (err) {
             respObj.error = err;
@@ -55,7 +59,7 @@ module.exports = {
         }
     },
 
-    async getSpecificOrder(req, res) {
+    async deleteOrderById(req, res) {
         let respObj = {
             IsSuccess: false,
             Message: "OK.",
@@ -63,19 +67,80 @@ module.exports = {
         };
 
         try {
-            let result = await Order.find({ _id: req.params.orderId })
-
-            respObj.IsSuccess = true;
-            respObj.Data = result
-            respObj.Message = "Succefully get all data"
-            res.status(200).json(respObj);
+            let result = await Order.findOneAndDelete({ order_id: req.body.orderId })
+            result ? res.status(200).send({
+                Message: "Susscefully deleted order",
+                IsSuccess: true,
+                Data: result
+            }) :
+                result.status(422).send({
+                    Message: "Failed to delete",
+                    IsSuccess: false
+                })
 
         } catch (err) {
             respObj.error = err;
             (respObj.message = err.message || "Error while processing db query"),
                 res.status(500).json(respObj);
         }
-    }
-    
-}
+    },
 
+    async updateOrder(req, res) {
+        let respObj = {
+            IsSuccess: false,
+            Message: "OK.",
+            Data: null,
+        };
+
+        try {
+            let result = await Order.findOneAndUpdate({ order_id: req.body.orderId },
+
+            )
+            let result = await Order.findOneAndUpdate({ order_id: req.body.orderId },
+                req.body, { upsert: true }, function (err, doc) {
+                    if (err) return res.send(500, {
+                        error: err, Message: "Failed to fetch",
+                        IsSuccess: false
+                    });
+                    return res.send({
+                        Message: "Susscefully fetch order",
+                        IsSuccess: true,
+                        Data: result
+                    });
+                });
+
+        } catch (err) {
+            respObj.error = err;
+            (respObj.message = err.message || "Error while processing db query"),
+                res.status(500).json(respObj);
+        }
+    },
+
+    async getOrderById(req, res) {
+        let respObj = {
+            IsSuccess: false,
+            Message: "OK.",
+            Data: null,
+        };
+
+        try {
+            let result = await Order.find({ order_id: req.body.orderId })
+            result ? res.status(200).send({
+                Message: "Susscefully fetch order",
+                IsSuccess: true,
+                Data: result
+            }) :
+                result.status(422).send({
+                    Message: "Failed to fetch",
+                    IsSuccess: false
+                })
+
+        } catch (err) {
+            respObj.error = err;
+            (respObj.message = err.message || "Error while processing db query"),
+                res.status(500).json(respObj);
+        }
+    },
+
+
+}
