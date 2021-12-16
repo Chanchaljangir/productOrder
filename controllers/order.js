@@ -62,7 +62,7 @@ module.exports = {
     async deleteOrderById(req, res) {
         let respObj = {
             IsSuccess: false,
-            Message: "OK.",
+            Message: "OK",
             Data: null,
         };
 
@@ -93,9 +93,6 @@ module.exports = {
         };
 
         try {
-            let result = await Order.findOneAndUpdate({ order_id: req.body.orderId },
-
-            )
             let result = await Order.findOneAndUpdate({ order_id: req.body.orderId },
                 req.body, { upsert: true }, function (err, doc) {
                     if (err) return res.send(500, {
