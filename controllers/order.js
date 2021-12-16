@@ -15,7 +15,7 @@ module.exports = {
             }).then(async function (data) {
                 if (data) {
                     respObj.IsSuccess = true;
-                    respObj.Message = "Order id is must be unique"
+                    respObj.Message = "Order id must be unique"
                     res.status(200).json(respObj);
                 } else {
                     let result = await new Order(req.body).save()
@@ -40,7 +40,7 @@ module.exports = {
 
         try {
             let result = await Order.find({
-                order_date: req.params.date
+                order_date: req.body.order_date
             })
             result ? res.status(200).send({
                 Message: "Susscefully fetch all orders",
@@ -85,6 +85,7 @@ module.exports = {
         }
     },
 
+
     async updateOrder(req, res) {
         let respObj = {
             IsSuccess: false,
@@ -121,7 +122,9 @@ module.exports = {
         };
 
         try {
-            let result = await Order.find({ order_id: req.body.orderId })
+            console.log("req.body.orderId",req.body.order_id)
+            let result = await Order.find({ order_id: req.body.order_id })
+            console.log("result.................. ", result)
             result ? res.status(200).send({
                 Message: "Susscefully fetch order",
                 IsSuccess: true,
